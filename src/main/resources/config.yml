@@ -19,5 +19,5 @@ kickMessage: You are not on the whitelist!
 #Do you want the whitelist to enable on startup?
 enabledOnStartup: true
 
-version: 2.0
+version: 3.0
 auto-update: true

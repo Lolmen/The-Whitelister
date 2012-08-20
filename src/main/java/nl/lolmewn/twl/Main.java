@@ -3,8 +3,9 @@
  */
 package nl.lolmewn.twl;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -26,10 +27,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Main extends JavaPlugin {
 
     private Settings settings;
-    private Set<String> whitelisted = new HashSet<String>();
+    private Set<String> whitelisted;
     private boolean whitelistEnabled = true;
     
     private MySQL mysql;
+    
+    private boolean updateAvailable;
+    private double newVersion;
 
     @Override
     public void onEnable() {
@@ -40,11 +44,17 @@ public class Main extends JavaPlugin {
         }
         loadConfig();
         loadPlayers();
+        if(this.getSettings().isUpdate()){
+            this.checkUpdate();
+        }
     }
 
     @Override
     public void onDisable() {
         this.savePlayers();
+        if(this.updateAvailable){
+            this.downloadFile("https://dl.dropbox.com/u/7365249/TheWhiteLister.jar");
+        }
     }
     
     public Settings getSettings(){
@@ -105,7 +115,7 @@ public class Main extends JavaPlugin {
         }else{
             File file = new File(this.getDataFolder(), "players.yml");
             YamlConfiguration f = YamlConfiguration.loadConfiguration(file);
-            this.whitelisted = f.getConfigurationSection("").getKeys(false);
+            this.whitelisted = new HashSet<String>(f.getStringList("players"));
         }
     }
 
@@ -196,7 +206,7 @@ public class Main extends JavaPlugin {
         }
         this.whitelisted.remove(player);
         if(this.settings.isUseMySQL()){
-            //TODO query deletion of player
+            this.getMySQL().executeStatement("DELETE FROM " + this.getSettings().getDbTable() + " WHERE player='" + player + "'");
         }
         return player + " unwhitelisted!";
     }
@@ -207,7 +217,7 @@ public class Main extends JavaPlugin {
         }
         this.whitelisted.add(player);
         if(this.settings.isUseMySQL()){
-            //TODO query addition of player
+            this.getMySQL().executeStatement("INSERT INTO " + this.getSettings().getDbTable() + "(player) VALUES ('" + player + "')");
         }
         return player + " whitelisted!";
     }
@@ -216,9 +226,7 @@ public class Main extends JavaPlugin {
         if(this.whitelisted.isEmpty()){
             return;
         }
-        if(this.settings.isUseMySQL()){
-            //nothing to do here, as they save on-creation.
-        }else{
+        if(!this.settings.isUseMySQL()){ //no need to save them if MySQL is used, that gets done automatically.
             File file = new File(this.getDataFolder(), "players.yml");
             if(!file.exists()){
                 try {
@@ -229,7 +237,7 @@ public class Main extends JavaPlugin {
             }
             YamlConfiguration f = YamlConfiguration.loadConfiguration(file);
             try {
-                //TODO set the value in the config
+                f.set("players", this.whitelisted);
                 f.save(file);
             } catch (IOException ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
@@ -242,5 +250,45 @@ public class Main extends JavaPlugin {
                 this.getSettings().getDbPort(), this.getSettings().getDbUser(),
                 this.getSettings().getDbPass(), this.getSettings().getDbDatabase(),
                 this.getSettings().getDbTable());
+    }
+    
+    private void checkUpdate() {
+        try {
+            URL url = new URL("http://dl.dropbox.com/u/7365249/twl.txt");
+            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+            String str;
+            while ((str = in.readLine()) != null) {
+                if (this.getSettings().getVersion() < Double.parseDouble(str)) {
+                    this.updateAvailable = true;
+                    this.getLogger().info("An update is available! Will be downloaded on Disable! Old version: " + this.getSettings().getVersion() + " New version: " + str);
+                    this.newVersion = Double.parseDouble(str);
+                }
+            }
+            in.close();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void downloadFile(String location) {
+        try {
+            this.getLogger().info("Updating The Whitelister.. Please wait.");
+            BufferedInputStream in = new BufferedInputStream(new URL(location).openStream());
+            FileOutputStream fout = new FileOutputStream(nl.lolmewn.twl.Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+            byte data[] = new byte[1024]; //Download 1 KB at a time
+            int count;
+            while ((count = in.read(data, 0, 1024)) != -1) {
+                fout.write(data, 0, count);
+            }
+            this.getLogger().info("Update complete!");
+            in.close();
+            fout.close();
+            this.getConfig().set("version", newVersion);
+            this.saveConfig();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
