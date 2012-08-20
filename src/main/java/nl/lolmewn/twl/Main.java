@@ -164,7 +164,7 @@ public class Main extends JavaPlugin {
         }
         if(args[0].equals("list")){
             if(sender.hasPermission("wl.seelist")){
-                sender.sendMessage("Whitelisted: " + this.whitelisted.size());
+                sender.sendMessage(ChatColor.GREEN + "Whitelisted: " + ChatColor.RED + this.whitelisted.size());
                 sender.sendMessage(Arrays.toString(this.whitelisted.toArray()));
                 return true;
             }else{
@@ -256,7 +256,7 @@ public class Main extends JavaPlugin {
             }
             YamlConfiguration f = YamlConfiguration.loadConfiguration(file);
             try {
-                f.set("players", this.whitelisted);
+                f.set("players", this.whitelisted.toArray(new String[0]));
                 f.save(file);
             } catch (IOException ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
