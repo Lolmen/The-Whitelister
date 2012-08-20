@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -83,6 +84,7 @@ public class Main extends JavaPlugin {
             int wl = loadVanillaWhitelist();
             this.getLogger().info("Added " + world + " from default world and " + wl + " from previous whitelist");
             this.settings = new Settings(this.getConfig());
+            this.checkOldVersion();
             this.savePlayers();
         }else{
             this.settings = new Settings(this.getConfig());
@@ -309,5 +311,21 @@ public class Main extends JavaPlugin {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void checkOldVersion() {
+        File old = new File(this.getDataFolder(), "whitelist.yml");
+        if(!old.exists()){
+            return;
+        }
+        YamlConfiguration c = YamlConfiguration.loadConfiguration(old);
+        List<String> list = c.getStringList("whitelisted");
+        for(String player : list){
+            if(this.whitelisted.contains(player)){
+                continue;
+            }
+            this.whitelisted.add(player);
+        }
+        this.getLogger().info("Loaded old players from whitelist.yml! (At least, tried to ;))");
     }
 }
