@@ -1,0 +1,9 @@
+name: The Whitelister
+author: Lolmewn
+version: 3.0
+main: nl.lolmewn.twl.Main
+commands:
+  wl:
+    description: The Main whitelist command
+    usage: /<command> for all whitelister commands
+    aliases: /whitelister

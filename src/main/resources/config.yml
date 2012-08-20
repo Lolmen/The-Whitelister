@@ -1,0 +1,23 @@
+#######################
+### The Whitelister ###
+###   By Lolmewn    ###
+#######################
+
+#Do you want to use MySQL for storing all players?
+useMySQL: false
+#If you put useMySQL to true, fill this in.
+MySQL:
+    username: root
+    password: HerpDerp
+    database: minecraft
+    host: localhost
+    port: 3306
+    table: whitelister
+    
+#Message player gets when not on whitelist.
+kickMessage: You are not on the whitelist!
+#Do you want the whitelist to enable on startup?
+enabledOnStartup: true
+
+version: 2.0
+auto-update: true
