@@ -27,7 +27,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Main extends JavaPlugin {
 
     private Settings settings;
-    private Set<String> whitelisted;
+    private Set<String> whitelisted = new HashSet<String>();
     private boolean whitelistEnabled = true;
     
     private MySQL mysql;
@@ -114,6 +114,14 @@ public class Main extends JavaPlugin {
             }
         }else{
             File file = new File(this.getDataFolder(), "players.yml");
+            if(!file.exists()){
+                try {
+                    file.createNewFile();
+                } catch (IOException ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                return;
+            }
             YamlConfiguration f = YamlConfiguration.loadConfiguration(file);
             this.whitelisted = new HashSet<String>(f.getStringList("players"));
         }
