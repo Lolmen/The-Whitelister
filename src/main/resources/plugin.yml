@@ -6,4 +6,4 @@ commands:
   wl:
     description: The Main whitelist command
     usage: /<command> for all whitelister commands
-    aliases: /whitelister
+    aliases: [whitelister, whitelist]

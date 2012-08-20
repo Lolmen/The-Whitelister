@@ -146,58 +146,69 @@ public class Main extends JavaPlugin {
     
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
-        if(cmd.getName().equalsIgnoreCase("wl")){
-            if(args.length == 0){
-                sender.sendMessage("=================");
-                sender.sendMessage("The Whitelister");
-                sender.sendMessage("Version: " + this.getDescription().getVersion());
-                sender.sendMessage("Active: " + (this.whitelistEnabled ? ChatColor.GREEN + "True" : ChatColor.RED + "False") );
-                sender.sendMessage("=================");
+        if(args.length == 0){
+            sender.sendMessage("=================");
+            sender.sendMessage("The Whitelister");
+            sender.sendMessage("Version: " + this.getDescription().getVersion());
+            sender.sendMessage("Active: " + (this.whitelistEnabled ? ChatColor.GREEN + "True" : ChatColor.RED + "False") );
+            sender.sendMessage("=================");
+            return true;
+        }
+        if(args[0].equals("list")){
+            if(sender.hasPermission("wl.seelist")){
+                sender.sendMessage("Whitelisted: " + this.whitelisted.size());
+                sender.sendMessage(Arrays.toString(this.whitelisted.toArray()));
+                return true;
+            }else{
+                sender.sendMessage("You don't have permissions to do this!");
                 return true;
             }
-            if(args[0].equals("list")){
-                if(sender.hasPermission("wl.seelist")){
-                    sender.sendMessage("Whitelisted: " + this.whitelisted.size());
-                    sender.sendMessage(Arrays.toString(this.whitelisted.toArray()));
-                    return true;
-                }else{
-                    sender.sendMessage("You don't have permissions to do this!");
-                    return true;
-                }
-            }
-            if(args[0].equals("toggle")){
-                if(!sender.hasPermission("wl.toggle")){
-                    sender.sendMessage("You don't have permissions to do this!");
-                    return true;
-                }
-                this.whitelistEnabled = !this.whitelistEnabled;
-                sender.sendMessage("The whitelist is now " + (this.whitelistEnabled ? ChatColor.GREEN + "enabled" : ChatColor.RED + "disabled"));
+        }
+        if(args[0].equals("toggle")){
+            if(!sender.hasPermission("wl.toggle")){
+                sender.sendMessage("You don't have permissions to do this!");
                 return true;
             }
-            if(args[0].equals("remove") || args[0].equals("delete")){
-                if(!sender.hasPermission("wl.remove")){
-                    sender.sendMessage("You don't have permissions to do this!");
-                    return true;
-                }
-                if(args.length == 1){
-                    sender.sendMessage("Usage: /wl remove <player1> <player2> ...");
-                    return true;
-                }
-                for(int i = 1; i < args.length; i++){
-                    sender.sendMessage(this.removePlayer(args[i]));
-                }
+            this.whitelistEnabled = !this.whitelistEnabled;
+            sender.sendMessage("The whitelist is now " + (this.whitelistEnabled ? ChatColor.GREEN + "enabled" : ChatColor.RED + "disabled"));
+            return true;
+        }
+        if(args[0].equals("remove") || args[0].equals("delete")){
+            if(!sender.hasPermission("wl.remove")){
+                sender.sendMessage("You don't have permissions to do this!");
                 return true;
             }
+            if(args.length == 1){
+                sender.sendMessage("Usage: /wl remove <player1> <player2> ...");
+                return true;
+            }
+            for(int i = 1; i < args.length; i++){
+                sender.sendMessage(this.removePlayer(args[i]));
+            }
+            return true;
+        }
+        if(args[0].equals("add")){
             if(!sender.hasPermission("wl.add")){
                 sender.sendMessage("You don't have permissions to do this!");
                 return true;
             }
-            for(int i = 0; i < args.length; i++){
+            if(args.length == 1){
+                sender.sendMessage("Usage: /wl add <player1> <player2> ...");
+                return true;
+            }
+            for(int i = 1; i < args.length; i++){
                 sender.sendMessage(this.addPlayer(args[i]));
             }
             return true;
         }
-        return false;
+        if(!sender.hasPermission("wl.add")){
+            sender.sendMessage("You don't have permissions to do this!");
+            return true;
+        }
+        for(int i = 0; i < args.length; i++){
+            sender.sendMessage(this.addPlayer(args[i]));
+        }
+        return true;
     }
     
     protected String removePlayer(String player){
