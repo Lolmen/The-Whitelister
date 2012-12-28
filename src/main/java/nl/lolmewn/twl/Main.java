@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import nl.lolmewn.twl.Updater.UpdateType;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -53,9 +54,6 @@ public class Main extends JavaPlugin {
     @Override
     public void onDisable() {
         this.savePlayers();
-        if(this.updateAvailable){
-            this.downloadFile("https://dl.dropbox.com/u/7365249/TheWhiteLister.jar");
-        }
     }
     
     public Settings getSettings(){
@@ -274,43 +272,7 @@ public class Main extends JavaPlugin {
     }
     
     private void checkUpdate() {
-        try {
-            URL url = new URL("http://dl.dropbox.com/u/7365249/twl.txt");
-            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-            String str;
-            while ((str = in.readLine()) != null) {
-                if (this.getSettings().getVersion() < Double.parseDouble(str)) {
-                    this.updateAvailable = true;
-                    this.getLogger().info("An update is available! Will be downloaded on Disable! Old version: " + this.getSettings().getVersion() + " New version: " + str);
-                    this.newVersion = Double.parseDouble(str);
-                }
-            }
-            in.close();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void downloadFile(String location) {
-        try {
-            this.getLogger().info("Updating The Whitelister.. Please wait.");
-            BufferedInputStream in = new BufferedInputStream(new URL(location).openStream());
-            FileOutputStream fout = new FileOutputStream(nl.lolmewn.twl.Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
-            byte data[] = new byte[1024]; //Download 1 KB at a time
-            int count;
-            while ((count = in.read(data, 0, 1024)) != -1) {
-                fout.write(data, 0, count);
-            }
-            this.getLogger().info("Update complete!");
-            in.close();
-            fout.close();
-            this.getConfig().set("version", newVersion);
-            this.saveConfig();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        new Updater(this, "whitelister", this.getFile(), UpdateType.DEFAULT, true);
     }
 
     private void checkOldVersion() {

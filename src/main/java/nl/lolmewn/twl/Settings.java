@@ -3,6 +3,7 @@
  */
 package nl.lolmewn.twl;
 
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 
 /**
@@ -86,7 +87,7 @@ public class Settings {
             this.dbTable = this.config.getString("MySQL.table");
             this.dbPort = this.config.getInt("MySQL.port");
         }
-        this.kickMessage = this.config.getString("kickMessage", "You are not on the whitelist!");
+        this.kickMessage = ChatColor.translateAlternateColorCodes('&', this.config.getString("kickMessage", "You are not on the whitelist!"));
         this.enableOnStartup = this.config.getBoolean("enableOnStartup", true);
         this.version = this.config.getInt("version");
         this.update = this.config.getBoolean("auto-update", true);
