@@ -21,7 +21,6 @@ public class Settings {
     private String kickMessage;
     private boolean enableOnStartup;
     
-    private int version;
     private boolean update;
     
     public Settings(FileConfiguration config){
@@ -73,10 +72,6 @@ public class Settings {
         return update;
     }
 
-    public int getVersion() {
-        return version;
-    }
-
     private void loadSettings() {
         this.useMySQL = this.config.getBoolean("useMySQL", false);
         if(useMySQL){
@@ -89,7 +84,6 @@ public class Settings {
         }
         this.kickMessage = ChatColor.translateAlternateColorCodes('&', this.config.getString("kickMessage", "You are not on the whitelist!"));
         this.enableOnStartup = this.config.getBoolean("enableOnStartup", true);
-        this.version = this.config.getInt("version");
         this.update = this.config.getBoolean("auto-update", true);
     }
     

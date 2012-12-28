@@ -3,9 +3,8 @@
  */
 package nl.lolmewn.twl;
 
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.File;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -33,9 +32,6 @@ public class Main extends JavaPlugin {
     private boolean whitelistEnabled = true;
     
     private MySQL mysql;
-    
-    private boolean updateAvailable;
-    private double newVersion;
 
     @Override
     public void onEnable() {
@@ -46,9 +42,7 @@ public class Main extends JavaPlugin {
         }
         loadConfig();
         loadPlayers();
-        if(this.getSettings().isUpdate()){
-            this.checkUpdate();
-        }
+        this.checkUpdate(this.getSettings().isUpdate());
     }
 
     @Override
@@ -271,8 +265,12 @@ public class Main extends JavaPlugin {
                 this.getSettings().getDbTable());
     }
     
-    private void checkUpdate() {
-        new Updater(this, "whitelister", this.getFile(), UpdateType.DEFAULT, true);
+    private void checkUpdate(boolean update) {
+        if(update){
+            new Updater(this, "whitelister", this.getFile(), UpdateType.DEFAULT, true);
+        }else{
+            new Updater(this, "whitelister", this.getFile(), UpdateType.NO_DOWNLOAD, true);
+        }
     }
 
     private void checkOldVersion() {
