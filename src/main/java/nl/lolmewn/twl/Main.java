@@ -268,8 +268,6 @@ public class Main extends JavaPlugin {
     private void checkUpdate(boolean update) {
         if(update){
             new Updater(this, "whitelister", this.getFile(), UpdateType.DEFAULT, true);
-        }else{
-            new Updater(this, "whitelister", this.getFile(), UpdateType.NO_DOWNLOAD, true);
         }
     }
 
